@@ -251,13 +251,12 @@ void DisplayReconfigurationCallback(CGDirectDisplayID cg_id,
 	statusItem = [[[NSStatusBar systemStatusBar] statusItemWithLength: NSSquareStatusItemLength] retain];
 	
 	NSImage* statusImage = [NSImage imageNamed: @"StatusIcon"];
-	statusItem.button.image = statusImage;
-	[statusItem.button.cell setHighlightsBy: NSContentsCellMask];
+	[statusItem setImage: statusImage];
+	[statusItem setHighlightMode: YES];
 
-  BOOL supportsDarkMenu = !(floor(NSAppKitVersionNumber) < 1343);
+  BOOL supportsDarkMenu = !(floor(NSAppKitVersionNumber) < 1343);  // NSAppKitVersionNumber10_10
   if (supportsDarkMenu) {
-    // [[statusItem image] setTemplate:YES];
-	  [statusItem.button.image setTemplate: YES];
+    [[statusItem image] setTemplate:YES];
   }
 
 	[self refreshStatusMenu];
