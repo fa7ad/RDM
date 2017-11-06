@@ -249,7 +249,6 @@ void DisplayReconfigurationCallback(CGDirectDisplayID cg_id,
   }
 
 	[self refreshStatusMenu];
-
     CGDisplayRegisterReconfigurationCallback(DisplayReconfigurationCallback, self);
 }
 
