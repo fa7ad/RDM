@@ -237,7 +237,7 @@ void DisplayReconfigurationCallback(CGDirectDisplayID cg_id,
 {
 //	NSLog(@"Finished launching");
 	statusItem = [[[NSStatusBar systemStatusBar] statusItemWithLength: NSSquareStatusItemLength] retain];
-	
+
 	NSImage* statusImage = [NSImage imageNamed: @"StatusIcon"];
 	[statusItem setImage: statusImage];
 	[statusItem setHighlightMode: YES];
@@ -248,6 +248,7 @@ void DisplayReconfigurationCallback(CGDirectDisplayID cg_id,
   }
 
 	[self refreshStatusMenu];
+
     CGDisplayRegisterReconfigurationCallback(DisplayReconfigurationCallback, self);
 }
 
