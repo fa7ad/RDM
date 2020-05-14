@@ -1,13 +1,16 @@
+extern "C"
+{
+#import <getopt.h>
+}
+
+
 #import <Foundation/Foundation.h>
 
 #import <dlfcn.h>
 
 #import "utils.h"
 
-
-
-
-int cmdline_main(int argc, const char * argv[])
+int cmdline_main(int argc, char * const*argv)
 {
 	//exit(0);
 	
@@ -134,7 +137,6 @@ int cmdline_main(int argc, const char * argv[])
 				}
 				return -1;
 			}
-			return -1;
 		}
 
 		uint32_t nDisplays;
