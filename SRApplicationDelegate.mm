@@ -74,7 +74,7 @@
 				if(mainModeNum == j)
 				{
 					mainItem = item;
-					[item setState: NSOnState];
+					[item setState: NSControlStateValueOn];
 				}
 				[displayMenuItems addObject: item];
 				[item release];
@@ -146,7 +146,7 @@
 				if(mainModeNum == j)
 				{
 					mainItem = item;
-					[item setState: NSOnState];
+					[item setState: NSControlStateValueOn];
 				}
 				[displayMenuItems addObject: item];
 				[item release];
@@ -232,12 +232,13 @@
 	statusItem = [[[NSStatusBar systemStatusBar] statusItemWithLength: NSSquareStatusItemLength] retain];
 
 	NSImage* statusImage = [NSImage imageNamed: @"StatusIcon"];
-	[statusItem setImage: statusImage];
-	[statusItem setHighlightMode: YES];
+	statusItem.button.image = statusImage;
+	[statusItem.button.cell setHighlightsBy: NSContentsCellMask];
 
-  BOOL supportsDarkMenu = !(floor(NSAppKitVersionNumber) < 1343);  // NSAppKitVersionNumber10_10
+  BOOL supportsDarkMenu = !(floor(NSAppKitVersionNumber) < 1343);
   if (supportsDarkMenu) {
-    [[statusItem image] setTemplate:YES];
+    // [[statusItem image] setTemplate:YES];
+	  [statusItem.button.image setTemplate: YES];
   }
 
 	[self refreshStatusMenu];
