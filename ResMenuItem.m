@@ -46,22 +46,22 @@
 		{
 			if(refreshRate)
 			{
-				title = [NSString stringWithFormat: @"⚡️ %d × %d — %d:%d, %.0f Hz", width, height, _w, _h, refreshRate];
+				title = [NSString stringWithFormat: @"%d × %d, %.0f Hz ⚡️", width, height, refreshRate];
 			}
 			else
 			{
-				title = [NSString stringWithFormat: @"⚡️ %d × %d — %d:%d", width, height, _w, _h];
+				title = [NSString stringWithFormat: @"%d × %d ⚡️", width, height];
 			}
 		}
 		else
 		{
 			if(refreshRate)
 			{
-				title = [NSString stringWithFormat: @"%d × %d — %d:%d, %.0f Hz", width, height, _w, _h, refreshRate];
+				title = [NSString stringWithFormat: @"%d × %d, %.0f Hz", width, height, refreshRate];
 			}
 			else
 			{
-				title = [NSString stringWithFormat: @"%d × %d — %d:%d", width, height, _w, _h];
+				title = [NSString stringWithFormat: @"%d × %d", width, height];
 			}
 		}
 		[self setTitle: title];
@@ -81,11 +81,11 @@
 	{
 		if(scale == 2.0f)
 		{
-			title = [NSString stringWithFormat: @"⚡ %d × %d — %d:%d", width, height, _w, _h];
+			title = [NSString stringWithFormat: @"%d × %d ⚡", width, height];
 		}
 		else
 		{
-			title = [NSString stringWithFormat: @"%d × %d — %d:%d", width, height, _w, _h];
+			title = [NSString stringWithFormat: @"%d × %d", width, height];
 		}
 	}
 
