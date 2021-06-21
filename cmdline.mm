@@ -18,6 +18,7 @@ int cmdline_main(int argc, char * const*argv)
  	{
 		int width = 0;
 		int height = 0;
+		int freq = 0;
 		CGFloat scale = 0.0f;
 		int bitRes = 0;
 		int displayNo = -1;
@@ -25,46 +26,115 @@ int cmdline_main(int argc, char * const*argv)
 		
 		bool listDisplays = 0;
 		bool listModes = 0;
-
-		static struct option longopts[] = {
-			{"width", required_argument, NULL, 'w'},
-			{"height", required_argument, NULL, 'h'},
-			{"scale", required_argument, NULL, 's'},
-			{"bits", required_argument, NULL, 'b'},
-			{"display", required_argument, NULL, 'd'},
-			{"displays",no_argument, NULL, 'l'},
-			{"modes", no_argument, NULL, 'm'},
-			{NULL, 0, NULL, 0},
-		};
-
-		int ch;
-		while ((ch = getopt_long(argc, argv, "w:h:s:b:d:lmr:", longopts, NULL)) != -1) {
-			switch (ch) {
-			case 'w':
-				width = atoi(optarg);
-				break;
-			case 'h':
-				height = atoi(optarg);
-				break;
-			case 's':
-				scale = atof(optarg);
-				break;
-			case 'b':
-				bitRes = atoi(optarg);
-				break;
-			case 'd':
-				displayNo = atoi(optarg);
-				break;
-			case 'l':
-				listDisplays = 1;
-				break;
-			case 'm':
-				listModes = 1;
-				break;
-			case 'r':
-				rotation = atof(optarg);
-				break;
-			default:
+		
+		for(int i=1; i<argc; i++)
+		{
+			if(argv[i][0]=='-')
+			{
+				if(strlen(argv[i])==2)
+				{
+					switch(argv[i][1])
+					{
+						case 'w':
+							i++;
+							width = atoi(argv[i]);
+							break;
+						case 'h':
+							i++;
+							height = atoi(argv[i]);
+							break;
+						case 'f':
+							i++;
+							freq = atoi(argv[i]);
+							break;
+						case 's':
+							i++;
+							scale = atof(argv[i]);
+							break;
+						case 'b':
+							i++;
+							bitRes = atoi(argv[i]);
+							break;
+						case 'd':
+							i++;
+							displayNo = atoi(argv[i]);
+							break;
+						case 'l':
+							if(argv[i][2]=='m')
+								listModes = 1;
+							if(argv[i][2]=='d')
+								listDisplays = 1;
+							break;
+						case 'r':
+							i++;
+							rotation = atof(argv[i]);
+							break;
+						default:
+							return -1;
+					}
+					continue;
+				}
+				if(argv[i][1]=='l' && strlen(argv[i])==3)
+				{
+					if(argv[i][2]=='m')
+						listModes = 1;
+					else if(argv[i][2]=='d')
+						listDisplays = 1;
+					else
+						return -1;
+					continue;
+				}
+				if(argv[i][1]=='-')
+				{
+					if(!strcmp(&argv[i][2], "width"))
+					{
+						i++;
+						width = atoi(argv[i]);
+					}
+					else if(!strcmp(&argv[i][2], "height"))
+					{
+						i++;
+						height = atoi(argv[i]);
+					}
+					else if(!strcmp(&argv[i][2], "freq"))
+					{
+						i++;
+						freq = atoi(argv[i]);
+					}
+					else if(!strcmp(&argv[i][2], "scale"))
+					{
+						i++;
+						scale = atof(argv[i]);
+					}
+					else if(!strcmp(&argv[i][2], "bits"))
+					{
+						i++;
+						bitRes = atoi(argv[i]);
+					}
+					else if(!strcmp(&argv[i][2], "display"))
+					{
+						i++;
+						displayNo = atoi(argv[i]);
+					}
+					else if(!strcmp(&argv[i][2], "displays"))
+					{
+						listDisplays = 1;
+					}
+					else if(!strcmp(&argv[i][2], "modes"))
+					{
+						listModes = 1;
+					}
+					else if(!strcmp(&argv[i][2], "rotation"))
+					{
+						i++;
+						rotation = atof(argv[i]);
+					}
+					else
+					{
+						return -1;
+					}
+					continue;
+				}
 				return -1;
 			}
 		}
@@ -121,6 +191,8 @@ int cmdline_main(int argc, char * const*argv)
 				if(width && mode.derived.width != width)
 					continue;
 				if(height && mode.derived.height != height)
+					continue;
+				if(freq && mode.derived.freq != freq)
 					continue;
 				int mBitres = (mode.derived.depth == 4) ? 32 : 16;
 				if(bitRes && mBitres != bitRes)
@@ -192,6 +264,10 @@ int cmdline_main(int argc, char * const*argv)
 				width = mode.derived.width;
 				height = mode.derived.height;
 			}
+			if (!freq)
+			{
+				freq = mode.derived.freq;
+			}
 			if(!scale)
 			{
 				scale = mode.derived.density;
@@ -217,6 +293,8 @@ int cmdline_main(int argc, char * const*argv)
 				if(width && mode.derived.width != width)
 					continue;
 				if(height && mode.derived.height != height)
+					continue;
+				if(freq && mode.derived.freq != freq)
 					continue;
 				int mBitres = (mode.derived.depth == 4) ? 32 : 16;
 				if(bitRes && mBitres != bitRes)
