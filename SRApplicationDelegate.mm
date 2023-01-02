@@ -40,13 +40,13 @@ void DisplayReconfigurationCallback(CGDirectDisplayID cg_id,
 {
 	if(statusMenu)
 		[statusMenu release];
-	
+
 	statusMenu = [[NSMenu alloc] initWithTitle: @""];
-	
+
 	uint32_t nDisplays;
 	CGDirectDisplayID displays[0x10];
 	CGGetOnlineDisplayList(0x10, displays, &nDisplays);
-	
+
 	for(int i=0; i<nDisplays; i++)
 	{
 		CGDirectDisplayID display = displays[i];
@@ -57,23 +57,23 @@ void DisplayReconfigurationCallback(CGDirectDisplayID cg_id,
 			[item setEnabled: NO];
 			[statusMenu addItem: item];
 		}
-		
-		
+
+
 		int mainModeNum;
 		CGSGetCurrentDisplayMode(display, &mainModeNum);
 		//modes_D4 mainMode;
 		//CGSGetDisplayModeDescriptionOfLength(display, mainModeNum, &mainMode, 0xD4);
 		ResMenuItem* mainItem = nil;
-		
-		
+
+
 		int nModes;
 		modes_D4* modes;
 		CopyAllDisplayModes(display, &modes, &nModes);
-		
+
 		{
 			NSMutableArray* displayMenuItems = [NSMutableArray new];
 			//ResMenuItem* mainItem = nil;
-			
+
 			for(int j = 0; j <nModes; j++)
 		    {
 				ResMenuItem* item = [[ResMenuItem alloc] initWithDisplay: display andMode: &modes[j]];
@@ -94,66 +94,54 @@ void DisplayReconfigurationCallback(CGDirectDisplayID cg_id,
 				idealRefreshRate = [mainItem refreshRate];
 			}
 			[displayMenuItems sortUsingSelector: @selector(compareResMenuItem:)];
-		
-		
+
+
 			NSMenu* submenu = [[NSMenu alloc] initWithTitle: @""];
-			
+
 			ResMenuItem* lastAddedItem = nil;
 			for(int j=0; j < [displayMenuItems count]; j++)
 			{
 				ResMenuItem* item = [displayMenuItems objectAtIndex: j];
 				if([item colorDepth] == idealColorDepth)
 				{
-					if([item refreshRate] == idealRefreshRate)
+					if (!lastAddedItem || [lastAddedItem _w] != [item _w] || [lastAddedItem _h] != [item _h])
 					{
-						[item setTextFormat: 1];
+						NSMenuItem* aspect;
+						NSString* title = [NSString stringWithFormat: @"%d:%d", [item _w], [item _h]];
+						aspect = [[NSMenuItem alloc] initWithTitle: title action: nil keyEquivalent: @""];
+						[aspect setEnabled: NO];
+						[submenu addItem: aspect];
 					}
-					
-					if(lastAddedItem && [lastAddedItem width]==[item width] && [lastAddedItem height]==[item height] && [lastAddedItem scale]==[item scale])
-					{
-						double lastRefreshRate = lastAddedItem ? [lastAddedItem refreshRate] : 0;
-						double refreshRate = [item refreshRate];
-						if(!lastAddedItem || (lastRefreshRate != idealRefreshRate && (refreshRate == idealRefreshRate || refreshRate > lastRefreshRate)))
-						{
-							if(lastAddedItem)
-							{
-								[submenu removeItem: lastAddedItem];
-								lastAddedItem = nil;
-							}
-							[submenu addItem: item];
-							lastAddedItem = item;
-						}
-					}
-					else
-					{	
+
+					if (!lastAddedItem || [lastAddedItem width] != [item width] || [lastAddedItem height] != [item height]) {
 						[submenu addItem: item];
-						lastAddedItem = item;
 					}
+					lastAddedItem = item;
 				}
 			}
-			
+
 			NSString* title;
 			{
 				if([mainItem scale] == 2.0f)
 				{
-					title = [NSString stringWithFormat: @"%d × %d ⚡️️", [mainItem width], [mainItem height]];
+					title = [NSString stringWithFormat: @"⚡️ %d:%d — %d × %d", [mainItem _w], [mainItem _h], [mainItem width], [mainItem height]];
 				}
 				else
 				{
-					title = [NSString stringWithFormat: @"%d × %d", [mainItem width], [mainItem height]];
+					title = [NSString stringWithFormat: @"%d:%d — %d × %d", [mainItem _w], [mainItem _h], [mainItem width], [mainItem height]];
 				}
 			}
-			
-			
+
+
 			NSMenuItem* resolution = [[NSMenuItem alloc] initWithTitle: title action: nil keyEquivalent: @""];
 			[resolution setSubmenu: submenu];
 			[submenu release];
 			[statusMenu addItem: resolution];
 			[resolution release];
-			
+
 			[displayMenuItems release];
 		}
-		
+
 		{
 			NSMutableArray* displayMenuItems = [NSMutableArray new];
 			ResMenuItem* mainItem = nil;
@@ -178,8 +166,8 @@ void DisplayReconfigurationCallback(CGDirectDisplayID cg_id,
 				idealRefreshRate = [mainItem refreshRate];
 			}
 			[displayMenuItems sortUsingSelector: @selector(compareResMenuItem:)];
-			
-			
+
+
 			NSMenu* submenu = [[NSMenu alloc] initWithTitle: @""];
 			for(int j=0; j< [displayMenuItems count]; j++)
 			{
@@ -195,7 +183,7 @@ void DisplayReconfigurationCallback(CGDirectDisplayID cg_id,
 			if(idealRefreshRate)
 			{
 				NSMenuItem* freq = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"%.0f Hz", [mainItem refreshRate]] action: nil keyEquivalent: @""];
-			
+
 				if([submenu numberOfItems] > 1)
 				{
 					[freq setSubmenu: submenu];
@@ -208,21 +196,21 @@ void DisplayReconfigurationCallback(CGDirectDisplayID cg_id,
 				[freq release];
 			}
 			[submenu release];
-			
+
 			[displayMenuItems release];
-			
+
 		}
-		
-		
+
+
 		free(modes);
-		
-		
+
+
 		[statusMenu addItem: [NSMenuItem separatorItem]];
 	}
-	
+
 	[statusMenu addItemWithTitle: @"About RDM" action: @selector(showAbout) keyEquivalent: @""];
-	
-	
+
+
 	[statusMenu addItemWithTitle: @"Quit" action: @selector(quit) keyEquivalent: @""];
 	[statusMenu setDelegate: self];
 	[statusItem setMenu: statusMenu];
@@ -233,10 +221,10 @@ void DisplayReconfigurationCallback(CGDirectDisplayID cg_id,
 {
 	CGDirectDisplayID display = [item display];
 	int modeNum = [item modeNum];
-	
+
 	SetDisplayModeNum(display, modeNum);
 	/*
-	
+
 	CGDisplayConfigRef config;
     if (CGBeginDisplayConfiguration(&config) == kCGErrorSuccess) {
         CGConfigureDisplayWithDisplayMode(config, display, mode, NULL);
