@@ -5,7 +5,7 @@ IDENTIFIER=net.alkalay.RDM
 
 VERSION=2.2
 
-CFLAGS += -std=gnu99
+CC=llvm-g++
 PACKAGE_BUILD=/usr/bin/pkgbuild
 
 .PHONY: build
