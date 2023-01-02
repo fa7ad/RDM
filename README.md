@@ -17,5 +17,6 @@ added support for easy installable package (PKG, DMG) and improved the way menu 
 displayed. I don't know what is the license by its authors because it came 100%
 uncommented and undocumented. But I'm sure they would enjoy you to freely use it. Me too.
 
-Want installable binary package? [It is here](http://avi.alkalay.net/software/RDM/).
+Want installable binary package? Compile your self by simply open Xcode project or use "make && make install".
 
+Worked with both aarch64 and amd64 Macs, confirmed working between macOS 10.12 and macOS 13.1, and should working in further versions as well.
