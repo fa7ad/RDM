@@ -17,6 +17,16 @@ added support for easy installable package (PKG, DMG) and improved the way menu 
 displayed. I don't know what is the license by its authors because it came 100%
 uncommented and undocumented. But I'm sure they would enjoy you to freely use it. Me too.
 
-Want installable binary package? Compile your self by simply open Xcode project or use "make && make install".
+~~Want installable binary package? Compile your self by simply open Xcode project or use "make && make install".~~
+_No longer necessary, See below_
 
 Worked with both aarch64 and amd64 Macs, confirmed working between macOS 10.12 and macOS 13.1, and should working in further versions as well.
+
+### NOTE
+
+This is a fork of a fork of a fork (there might have been more forking in between).
+My "fork" is just an attempt at automating the builds, so I don't have to build locally. I don't know objective C or how this app works, so don't file issues (unless you also have a PR).
+
+If you want a binary package, download the latest dmg in [Releases](https://github.com/fa7ad/RDM/releases), The CI should produce builds on every commit.
+If you want to compile it yourself, its really not hard. You just need to clone the repo and run `make dmg`
+
