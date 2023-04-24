@@ -1,0 +1,41 @@
+name: Publish Binaries
+
+on:
+  push:
+    branches: [ "master" ]
+    tags:
+      - '*'
+
+jobs:
+  build:
+    name: Build and publish package
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set Default Scheme
+        run: |
+          scheme_list=$(xcodebuild -list -json | tr -d "\n")
+          default=$(echo $scheme_list | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
+          echo $default | cat >default
+          echo Using default scheme: $default
+      - name: Set env
+        id: prepenv
+        run: |
+          export short_sha=$(git rev-parse --short ${{github.sha}})
+          export version=$(awk -F= '$1=="VERSION"{print $2}' Makefile)
+          export app_version="${version}-${short_sha}"
+          echo "app_version=${app_version}" >> $GITHUB_OUTPUT
+      - name: Build
+        run: |
+          make VERSION="${{steps.prepenv.outputs.app_version}}" dmg
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ github.token }}
+          file: RDM-${{steps.prepenv.outputs.app_version}}.dmg
+          asset_name: RDM-${{steps.prepenv.outputs.app_version}}.dmg
+          tag: RDM-v${{steps.prepenv.outputs.app_version}}
+          overwrite: true
+          body: "Version ${{steps.prepenv.outputs.app_version}}"
